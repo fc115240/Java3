@@ -1,0 +1,67 @@
+
+
+public class Server {
+	...
+    public Server() {
+        ...
+        //authService = new SimpleAuthService();
+        authService = new SqlLiteAuthService();
+        try (ServerSocket serverSocket = new ServerSocket(8189)) {
+			...
+        }
+		// Как то это некрасиво выглядит, подскажите пожалуйста как правильно сделать?
+        ((SqlLiteAuthService)authService).disconnect();
+		...
+		
+		
+		
+		
+package com.geekbrains.server;
+
+import java.sql.*;
+
+public class SqlLiteAuthService implements AuthService {
+    private Connection connection;
+    private Statement stmt;
+
+    public SqlLiteAuthService() {
+        try {
+            connect("sqllite-auth.db");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String getNicknameByLoginAndPassword(String login, String password) {
+        ResultSet rs = null;
+        try {
+            rs = stmt.executeQuery("SELECT nick FROM users WHERE login = '" + login + "' and pass = '" + password + "';");
+            rs.next();
+            return rs.getString("nick");
+        } catch (SQLException e) {
+            System.out.println("Authentification failed");
+        }
+        return null;
+    }
+
+    public void connect(String dB) throws ClassNotFoundException, SQLException {
+        Class.forName("org.sqlite.JDBC");
+        connection = DriverManager.getConnection("jdbc:sqlite:"+dB);
+        stmt = connection.createStatement();
+    }
+
+    public void disconnect() {
+        try {
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+		
