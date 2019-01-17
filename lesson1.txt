@@ -1,0 +1,124 @@
+public class Fruit {
+    float weight;
+
+    public Fruit() {
+        this.weight=0f;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    void setWeight(float weight) {
+        this.weight = weight;
+    }
+}
+
+public class Apple extends Fruit{
+
+    public Apple() {
+        setWeight(1f);
+    }
+}
+
+public class Orange extends Fruit {
+
+    public Orange() {
+        setWeight(1.5f);
+    }
+}
+
+public class Box<T extends Fruit> {
+    ArrayList<T> box;
+
+    public Box() {
+        box = new ArrayList<>();
+    }
+
+    public void Add(T fruit) {
+        box.add(fruit);
+    }
+
+    public T Remove(T fruit) {
+        box.remove(fruit);
+        return fruit;
+    }
+
+    public float GetWeight() {
+        float weight = 0;
+        for (T b: box) {
+            weight += b.weight;
+        }
+        return weight;
+    }
+
+    public boolean Compare(Box<?> box) {
+        return (Math.abs(GetWeight() - box.GetWeight()) < 0.0001);
+    }
+
+    public void MoveTo(Box<T> box) {
+        while (this.box.size() > 0) {
+            box.Add(this.Remove(this.box.get(0)));
+        }
+    }
+}
+
+
+public class MainClass {
+    public static void main(String[] args) {
+
+        Integer[] a = {2,4,6,8,10,12};
+        String[] b = {"A","B","C","D","E"};
+
+        // п.1
+        System.out.println("Array A: " + Arrays.toString(a));
+        System.out.println("Array B: " + Arrays.toString(b));
+        changeArrElement(a ,1 ,2);
+        changeArrElement(b ,1 ,2);
+        System.out.println("Array A: " + Arrays.toString(a));
+        System.out.println("Array B: " + Arrays.toString(b));
+
+        // п.2
+        ArrayList<Integer> alA = toArrayList(a);
+        ArrayList<String> alB = toArrayList(b);
+        System.out.println("ArrayList A " + alA);
+        System.out.println("ArrayList B " + alB);
+
+        // п.3
+        Box<Apple> boxApple = new Box<>();
+        boxApple.Add(new Apple());
+        boxApple.Add(new Apple());
+        boxApple.Add(new Apple());
+        System.out.println("Box Apple: " + boxApple.GetWeight());
+
+        Box<Orange> boxOrange = new Box<>();
+        boxOrange.Add(new Orange());
+        boxOrange.Add(new Orange());
+        boxOrange.Add(new Orange());
+        System.out.println("Box Orange: " + boxOrange.GetWeight());
+
+        Box<Orange> boxOrange2 = new Box<>();
+        boxOrange2.Add(new Orange());
+        boxOrange.MoveTo(boxOrange2);
+        System.out.println("Box Orange2: " + boxOrange2.GetWeight());
+        System.out.println("Box Orange: " + boxOrange.GetWeight());
+
+        System.out.println("Compare Result  = " + boxApple.Compare(boxOrange));
+
+    }
+
+    public static <T> ArrayList<T> toArrayList(T arr[]) {
+        ArrayList<T> aL = new ArrayList(arr.length);
+        for ( T a: arr ) {
+            aL.add(a);
+        }
+        return aL;
+    }
+
+    public static <T> void changeArrElement( T[] arr , int i1, int i2) {
+        T tmp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = tmp;
+    }
+
+}
