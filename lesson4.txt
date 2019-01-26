@@ -1,0 +1,112 @@
+1.
+public class Main {
+    static Object mon = new Object();
+    static volatile char currLetter = 'A';
+
+    public static void main(String[] args) {
+
+        new Thread(() -> {
+            synchronized (mon) {
+                try {
+                for (int i = 0; i < 5; i++) {
+                    while (currLetter != 'A') {
+                            mon.wait();
+                    }
+                    System.out.println("A");
+                    currLetter = 'B';
+                    mon.notifyAll();
+                }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        new Thread(() -> {
+            synchronized (mon) {
+                try {
+                    for (int i = 0; i < 5; i++) {
+                        while (currLetter != 'B') {
+                            mon.wait();
+                        }
+                        System.out.println("B");
+                        currLetter = 'C';
+                        mon.notifyAll();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        new Thread(() -> {
+            synchronized (mon) {
+                try {
+                    for (int i = 0; i < 5; i++) {
+                        while (currLetter != 'C') {
+                            mon.wait();
+                        }
+                        System.out.println("C");
+                        currLetter = 'A';
+                        mon.notifyAll();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+
+    }
+}
+
+
+2.
+public class Server {
+	...
+    private ExecutorService executorService = Executors. newFixedThreadPool ( 2 );
+	
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+	
+    public Server() {
+		...
+        } finally {
+            System.out.println("Сервер завершил свою работу");
+            executorService.shutdownNow();
+            ...
+        }
+    }
+	
+public ClientHandler(Server server, Socket socket) throws IOException {
+		...
+		// Ограничиваем количество одновременно подключенных клиентов.
+		// Если их больше двух то 3й будет ждать пока кто нибудь отключиться
+		// Насколько я понимаю создавать отдельный поток на каждого подключенного клиента это неправильно.
+		// При большом количестве потоков тратиться много времени на переключение контекстов
+		// и загрузка процессора растет даже если все потоки стоят.
+		// Более правильный подход ограничить количество потоков обработчиков он реализован в библиотеке Netty 
+		// только, самостоятельно изучать эту библиотеку пока плохо получается. 
+		// Скажите в нашем курсе что нибудь будет по этой теме?
+       server.getExecutorService().execute(() -> {
+            try {
+                while (!checkAuth() && !Thread.currentThread().isInterrupted()) ;
+                while (readMessage() && !Thread.currentThread().isInterrupted()) ;
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                ClientHandler.this.disconnect();
+            }
+        });
+//        new Thread(() -> {
+//            try {
+//                while (!checkAuth()) ;
+//                while (readMessage()) ;
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } finally {
+//                ClientHandler.this.disconnect();
+//            }
+//        }).start();		
+
