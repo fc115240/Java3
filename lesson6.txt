@@ -46,7 +46,6 @@ public class Main {
     }
 }
 
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -67,6 +66,10 @@ public class lesson6test {
     @Test
     public void processArr4() {
         Assert.assertArrayEquals(new int[] {1,2,3,1,1,7},Main.processArr(new int[] {1,2,4,1,2,3,1,1,7}));
+    }
+    @Test(expected = RuntimeException.class)
+    public void processArr5() {
+        Assert.assertArrayEquals(new int[] {1,2,3,1,1,7},Main.processArr(new int[] {1,2,5,1,2,3,1,1,7}));
     }
     @Test
     public void exist1and4_1() {
