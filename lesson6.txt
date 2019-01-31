@@ -1,0 +1,91 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) {
+
+        // п.1
+        int[] m1 = new int[] {1,2,4,4,2,3,4,1,7};
+        System.out.println(Arrays.toString(m1));
+        System.out.println(Arrays.toString(processArr(m1)));
+
+        // п.2
+        System.out.println(exist1and4(new int[] {2,2,3,3,4,3,3,2,7}));
+    }
+
+    public static int[] processArr(int[] arr) throws RuntimeException {
+        ArrayList<Integer> revArrLst = new ArrayList();
+
+        for (int i = arr.length - 1; i >= 0 ; i--) {
+            if (arr[i] == 4 && i < arr.length - 1) {
+
+                Integer[] revArr = new Integer[revArrLst.size()];
+                revArr = revArrLst.toArray(revArr);
+
+                int[] dirArr = new int[revArr.length];
+                for (int j = 0; j < revArr.length ; j++) {
+                    dirArr[j] = revArr[revArr.length - j - 1];
+                }
+                return dirArr;
+            } else {
+                revArrLst.add(arr[i]);
+            }
+        }
+        throw new RuntimeException();
+    }
+
+    public static boolean exist1and4(int[] arr) {
+        boolean is1 = false;
+        boolean is4 = false;
+        for (int i = 0; i < arr.length - 1; i++) {
+            if (arr[i] == 1) is1 = true;
+            if (arr[i] == 4) is4=true;
+            if (is1 && is4) return true;
+        }
+        return false;
+    }
+}
+
+import org.junit.Assert;
+import org.junit.Test;
+
+public class lesson6test {
+
+    @Test
+    public void processArr1() {
+        Assert.assertArrayEquals(new int[] {1,7},Main.processArr(new int[] {1,2,4,4,2,3,4,1,7}));
+    }
+    @Test
+    public void processArr2() {
+        Assert.assertArrayEquals(new int[] {2,3,6,1,7},Main.processArr(new int[] {1,2,4,4,2,3,6,1,7}));
+    }
+    @Test
+    public void processArr3() {
+        Assert.assertArrayEquals(new int[] {2,1,7},Main.processArr(new int[] {1,2,4,4,2,4,2,1,7}));
+    }
+    @Test
+    public void processArr4() {
+        Assert.assertArrayEquals(new int[] {1,2,3,1,1,7},Main.processArr(new int[] {1,2,4,1,2,3,1,1,7}));
+    }
+    @Test(expected = RuntimeException.class)
+    public void processArr5() {
+        Assert.assertArrayEquals(new int[] {1,2,3,1,1,7},Main.processArr(new int[] {1,2,5,1,2,3,1,1,7}));
+    }
+    @Test
+    public void exist1and4_1() {
+        Assert.assertTrue(Main.exist1and4(new int[] {1,2,3,4,4,3,3,2,7}));
+    }
+    @Test
+    public void exist1and4_2() {
+        Assert.assertTrue(Main.exist1and4(new int[] {1,2,3,1,4,3,6,2,7}));
+    }
+    @Test
+    public void exist1and4_3() {
+        Assert.assertFalse(Main.exist1and4(new int[] {5,2,3,4,4,3,3,2,7}));
+    }
+    @Test
+    public void exist1and4_4() {
+        Assert.assertFalse(Main.exist1and4(new int[] {1,2,3,9,9,3,1,2,7}));
+    }
+
+}
